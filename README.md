@@ -1,5 +1,5 @@
 适用于GTA4 1.08(Vice City Actual Next Gen Edition)的汉化程序<br/>
-修改人员：B站洛圣都超新星<br/>
+修改人员：B站洛圣都超新星&倾城剑舞<br/>
 依赖库<br/>
 [VC-LTL](https://github.com/Chuyu-Team/VC-LTL5)<br/><br/>
 [Vcpkg](https://github.com/microsoft/vcpkg)<br/>
