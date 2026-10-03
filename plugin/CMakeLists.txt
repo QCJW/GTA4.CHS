@@ -27,6 +27,7 @@ add_library(plugin SHARED
     gta_phone.cpp
     gta_save.cpp
     gta_string.cpp
+    gta_toupper.cpp
     gta_whm.cpp
     plugin.cpp
     string_table.cpp

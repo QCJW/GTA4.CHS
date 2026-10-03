@@ -18,6 +18,7 @@ struct mr_read_eax_edx
     }
 };
 
+// 412A9C
 struct mr_read_edx_eax
 {
     void operator()(injector::reg_pack &regs) const
@@ -30,29 +31,16 @@ struct mr_read_edx_eax
     }
 };
 
-// 412A9C
-struct mr_read_eax_esi
+// 同上，但结果写回 edx
+struct mr_read_edx_eax2
 {
     void operator()(injector::reg_pack &regs) const
     {
-        auto ptr = reinterpret_cast<char *>(regs.eax + regs.esi);
+        auto ptr = reinterpret_cast<char *>(regs.edx + regs.eax);
         auto ptr2 = ptr;
         regs.edx = utf8::unchecked::next(ptr2);
         auto offset = ptr2 - ptr;
-        regs.eax = regs.esi + offset;
-    }
-};
-
-// 413311
-struct mr_read_back_edi_eax
-{
-    void operator()(injector::reg_pack &regs) const
-    {
-        auto pclass = reinterpret_cast<class_for_mr *>(regs.edi);
-        auto ptr = &pclass->f48[pclass->f448];
-        auto ptr2 = ptr;
-        regs.ebx = utf8::unchecked::prior(ptr2);
-        pclass->f448 -= (ptr - ptr2);
+        regs.eax += offset;
     }
 };
 
@@ -82,18 +70,6 @@ struct mr_read_back_esi_ecx
 };
 
 // 412A7A
-struct mr_read_back_ecx_eax
-{
-    void operator()(injector::reg_pack &regs) const
-    {
-        auto pclass = reinterpret_cast<class_for_mr *>(regs.ecx);
-        auto ptr = &pclass->f48[pclass->f448];
-        auto ptr2 = ptr;
-        regs.eax = utf8::unchecked::prior(ptr2);
-        pclass->f448 -= (ptr - ptr2);
-    }
-};
-
 struct mr_read_back_eax_ecx
 {
     void operator()(injector::reg_pack &regs) const
@@ -103,18 +79,6 @@ struct mr_read_back_eax_ecx
         auto ptr2 = ptr;
         regs.eax = utf8::unchecked::prior(ptr2);
         pclass->f448 -= (ptr - ptr2);
-    }
-};
-
-// 413523
-struct mr_write_edi_ecx
-{
-    void operator()(injector::reg_pack &regs) const
-    {
-        auto pclass = reinterpret_cast<class_for_mr *>(regs.edi);
-        auto ptr = &pclass->f48[pclass->f448];
-        auto offset = utf8::unchecked::append(regs.ebx, ptr) - ptr;
-        pclass->f448 += offset;
     }
 };
 
@@ -138,24 +102,6 @@ struct mr_write_esi_eax
         auto ptr = &pclass->f48[pclass->f448];
         auto offset = utf8::unchecked::append(regs.ebx, ptr) - ptr;
         pclass->f448 += offset;
-    }
-};
-
-// 5E5205
-struct mr_write_ebp_esi
-{
-    void operator()(injector::reg_pack &regs) const
-    {
-        auto ptr = reinterpret_cast<char *>(regs.esi + regs.ebp);
-
-        // 对&nbsp之类字符的特殊处理，从sub_5E5250的逻辑来看，这么偷懒是可以的
-        // 目前中文字库最小的值是0x2014
-        if (regs.ecx > 0x100 && regs.ecx < 0x200)
-            regs.ecx -= 0x100;
-
-        auto offset = utf8::unchecked::append(regs.ecx, ptr) - ptr;
-        regs.esi += offset;
-        regs.ecx = regs.edi;
     }
 };
 
@@ -199,8 +145,9 @@ void register_patches()
     injector::MakeCALL(injector::aslr_ptr(0x453380).get(), gta_string::gtaMailAppendWideStringAsUtf8);
 
     // 去掉span标签
-    injector::MakeNOP(injector::aslr_ptr(0x453374).get(), 5);
-    injector::MakeNOP(injector::aslr_ptr(0x45338C).get(), 11);
+    // mov edx,标签串; mov eax,esi; call fnMailAppendByteString 为一组，共两组，整组NOP
+    injector::MakeNOP(injector::aslr_ptr(0x45336D).get(), 12);
+    injector::MakeNOP(injector::aslr_ptr(0x453385).get(), 12);
 
     // 读utf8序列
     // 用到"!--"的函数
@@ -249,5 +196,30 @@ void register_patches()
     // Native: GET_FIRST_N_CHARACTERS_OF_STRING(108B4A25)调用strncpy的地方
     injector::MakeCALL(injector::aslr_ptr(0xBAFFD6).get(), gta_string::gtaUTF8strncpy);
     injector::MakeNOP(injector::aslr_ptr(0xBAFFDF).get(), 7);
+
+    // "!--"函数里同构的内联分支，漏补会把多字节字符退化成单字节逻辑
+    // 第二处读取（判断"!--"）
+    injector::MakeInline<mr_read_eax_edx>(injector::aslr_ptr(0x5B5E1B).get(), injector::aslr_ptr(0x5B5E1B + 7).get());
+    // 第三处回退
+    injector::MakeInline<mr_read_back_esi_eax>(injector::aslr_ptr(0x5B5ECD).get(),
+                                               injector::aslr_ptr(0x5B5ECD + 17).get());
+    // 另三处写序列
+    injector::MakeInline<mr_write_esi_ecx>(injector::aslr_ptr(0x5B5E53).get(), injector::aslr_ptr(0x5B5E53 + 13).get());
+    injector::MakeInline<mr_write_esi_ecx>(injector::aslr_ptr(0x5B5E93).get(), injector::aslr_ptr(0x5B5E93 + 13).get());
+    injector::MakeInline<mr_write_esi_ecx>(injector::aslr_ptr(0x5B5F65).get(), injector::aslr_ptr(0x5B5F65 + 13).get());
+
+    // vftable[3] 把读到的字符写回缓冲，不补会把多字节码点截成低字节
+    injector::MakeInline<mr_write_esi_ecx>(injector::aslr_ptr(0x4506CE).get(), injector::aslr_ptr(0x4506CE + 19).get());
+    injector::MakeInline<mr_write_esi_ecx>(injector::aslr_ptr(0x45083F).get(), injector::aslr_ptr(0x45083F + 19).get());
+
+    // vftable[3] 里回退一个字符
+    injector::MakeInline<mr_read_back_esi_ecx>(injector::aslr_ptr(0x45071F).get(), injector::aslr_ptr(0x45071F + 18).get());
+
+    // "!--"函数的第三处读取
+    injector::MakeInline<mr_read_edx_eax2>(injector::aslr_ptr(0x5B5EEE).get(), injector::aslr_ptr(0x5B5EEE + 7).get());
+
+    // 解析 &xxx; 实体的函数
+    injector::MakeInline<mr_read_back_esi_eax>(injector::aslr_ptr(0x450F5D).get(), injector::aslr_ptr(0x450F5D + 18).get());
+    injector::MakeInline<mr_read_edx_eax2>(injector::aslr_ptr(0x450F7F).get(), injector::aslr_ptr(0x450F7F + 7).get());
 }
 } // namespace gta_mail_reply

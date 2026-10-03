@@ -16,9 +16,8 @@ void register_patches()
     plugin.game.game_addr.fnGraphics_SetRenderState = injector::aslr_ptr(0x8524C0).get();
 
     // GetCharacterSizeNormal使用了
-    // ButtonWidths紧跟着Font_Datas
     plugin.game.game_addr.pFont_Datas = injector::aslr_ptr(0x1176B58).get();
-    plugin.game.game_addr.pFont_ButtonWidths = reinterpret_cast<float *>(&plugin.game.game_addr.pFont_Datas[4]);
+    plugin.game.game_addr.pFont_ButtonWidths = injector::aslr_ptr(0x1179CB8).get();
 
     // GetStringWidth使用了
     plugin.game.game_addr.pFont_BlipWidth = injector::aslr_ptr(0x1179D78).get();

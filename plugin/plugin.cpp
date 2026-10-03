@@ -11,6 +11,7 @@
 #include "gta_phone.h"
 #include "gta_save.h"
 #include "gta_string.h"
+#include "gta_toupper.h"
 #include "gta_whm.h"
 
 CPlugin plugin;
@@ -54,6 +55,7 @@ bool CPlugin::Init(HMODULE module)
     plugin_module_path.SetModule(module);
 
     RegisterPatchSteps();
+    gta_toupper::apply();
 
     char_table.LoadTable(GetPluginAsset("char_table.dat"));
     whm_table.LoadTable(GetPluginAsset("whm_table.dat"));

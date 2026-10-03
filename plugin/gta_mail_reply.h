@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "../common/stdinc.h"
 
 namespace gta_mail_reply
 {
