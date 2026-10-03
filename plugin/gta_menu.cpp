@@ -14,6 +14,7 @@ void register_patches()
     injector::WriteMemory(injector::aslr_ptr(0x483BA0).get(), true, true);
     injector::WriteMemory(injector::aslr_ptr(0x483BC6).get(), true, true);
     injector::WriteMemory(injector::aslr_ptr(0x483BEC).get(), true, true);
+    injector::WriteMemory(injector::aslr_ptr(0x484001).get(), true, true);
 
     // 密集调用GetStringWidthJump的另一个函数
     // Esc菜单Header间距
