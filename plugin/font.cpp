@@ -174,16 +174,8 @@ float CFont::GetStringWidthRemake(const GTAChar* str, bool get_all)
             if (!get_all)
                 break;
         }
-        else if (!IsNativeChar(chr))
-        {
-            // 汉字
-            // 有可能是英语单词+汉字，要断开
-            if (had_word && !get_all)
-            {
-                break;
-            }
-        }
-        else if (chr == '~')
+        // 原版俄语/日语 gxt 里 token 名串每个字符都带 0x807E（'~' → 0x807E）。
+        else if (chr == '~' || chr == 0x807E)
         {
             // token
             if (had_word && !get_all)
@@ -253,8 +245,8 @@ float CFont::GetStringWidthRemake(const GTAChar* str, bool get_all)
                 had_word = true;
             }
 
-            // 91BFD3
-            while (*str != '~')
+            // token 尾扫描：与原版一致，并列比较 '~'(0x7E) 和带标记的 0x807E（0x91C47B / 0x91C480）
+            while (*str != '~' && *str != 0x807E)
             {
                 // 91BFE0
                 if (*str == 'n')
@@ -279,6 +271,15 @@ float CFont::GetStringWidthRemake(const GTAChar* str, bool get_all)
             }
 
             continue;
+        }
+        else if (!IsNativeChar(chr))
+        {
+            // 汉字
+            // 有可能是英语单词+汉字，要断开
+            if (had_word && !get_all)
+            {
+                break;
+            }
         }
 
         // 累加字符宽度

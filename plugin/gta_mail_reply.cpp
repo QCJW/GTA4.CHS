@@ -217,10 +217,5 @@ namespace gta_mail_reply
                 injector::MakeCALL(addresses[0].i(7), gta_string::gtaUTF8strncpy);
                 injector::MakeNOP(addresses[0].i(24), 7);
             });
-
-        //batch_matcher.register_step("", 1, [](const byte_pattern::result_type& addresses)
-//    {
-//
-//    });
     }
 }

@@ -52,10 +52,5 @@ void register_patches(batch_matching &batch_matcher)
                                     // 5D9B43
                                     injector::WriteMemory<uchar>(addresses[0].i(12), 0xEBu, true);
                                 });
-
-    // batch_matcher.register_step("", 1, [](const byte_pattern::result_type& addresses)
-    //     {
-    //
-    //     });
 }
 } // namespace gta_html

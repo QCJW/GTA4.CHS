@@ -12,6 +12,7 @@
 #include "gta_save.h"
 #include "gta_whm.h"
 #include "gta_mail_reply.h"
+#include "gta_toupper.h"
 
 CPlugin plugin;
 
@@ -57,10 +58,7 @@ bool CPlugin::Init(HMODULE module)
 
     RegisterPatchSteps(batch_matcher);
 
-    if (batch_matcher.perform_search())
-    {
-        batch_matcher.write_log("gta4.chs");
-    }
+    batch_matcher.perform_search();
 
     if (!batch_matcher.is_all_succeed())
     {
@@ -68,6 +66,11 @@ bool CPlugin::Init(HMODULE module)
     }
 
     batch_matcher.run_callbacks();
+
+    // 根因修复：exe 内“宽字符串转大写”函数的 ch>=0xE0 分支漏上界，
+    // 导致所有 CJK 被减 0x20（ESC 地图图例地名：博阿博 -> 区队区）。
+    // 不登记进 batch_matching：换版本没命中只该跳过这一处，不能拖垮其余补丁。
+    gta_toupper::apply();
 
     char_table.LoadTable(GetPluginAsset("char_table.dat"));
     whm_table.LoadTable(GetPluginAsset("whm_table.dat"));

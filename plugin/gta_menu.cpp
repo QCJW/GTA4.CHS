@@ -15,6 +15,7 @@ namespace gta_menu
                 injector::WriteMemory(addresses[0].i(0xB01C - 0xAF62 + 1), true, true);
                 injector::WriteMemory(addresses[0].i(0xB052 - 0xAF62 + 1), true, true);
                 injector::WriteMemory(addresses[0].i(0xB088 - 0xAF62 + 1), true, true);
+                injector::WriteMemory(addresses[0].i(0xB4E0 - 0xAF62 + 1), true, true);
             });
 
         //密集调用GetStringWidthJump的另一个函数

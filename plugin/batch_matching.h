@@ -22,9 +22,6 @@ class batch_matching
     bool is_all_succeed() const;
     void run_callbacks() const;
 
-    void write_log(const char *logger_name) const;
-
   private:
     std::unordered_map<std::string, match_step> _steps;
-    double _last_cost_ms;
 };
