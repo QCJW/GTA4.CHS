@@ -7,16 +7,19 @@ void register_patches(batch_matching &batch_matcher)
 {
     // 搜索"~%c~"找到CFont::ProcessString
 
-    // 使用"DD3D30"的代码下方
-    batch_matcher.register_step("8B 3D ? ? ? ? 8B 68 04 8B 30", 1, [](const byte_pattern::result_type &addresses) {
-        plugin.game.game_addr.ppD3DDevice = *addresses[0].p<IDirect3DDevice9 **>(2);
-    });
+    // 使用"DD3D30"的代码下方。该指针当前汉化逻辑未实际使用，不同小版本编码不同时允许缺失。
+    batch_matcher.register_step("8B 3D ? ? ? ? 8B 68 04 8B 30", 1,
+                                [](const byte_pattern::result_type &addresses) {
+                                    plugin.game.game_addr.ppD3DDevice = *addresses[0].p<IDirect3DDevice9 **>(2);
+                                },
+                                true, nullptr, false);
 
-    // IDA Names: const rage::grcTexturePC::`vtable'
+    // IDA Names: const rage::grcTexturePC::`vtable'。仅解析不用，1.2.0.59 编码不同时允许缺失。
     batch_matcher.register_step("C7 45 00 ? ? ? ? C7 45 44 00 00 00 00", 1,
                                 [](const byte_pattern::result_type &addresses) {
                                     plugin.game.game_addr.pTexturePCVirtualTable = *addresses[0].p<void *>(3);
-                                });
+                                },
+                                true, nullptr, false);
 
     // https://github.com/ThirteenAG/GTAIV.EFLC.FusionFix/blob/master/source/dllmain.cpp
     // Native: GET_CURRENT_EPISODE(7D7619D2)里面
@@ -84,16 +87,29 @@ void register_patches(batch_matching &batch_matcher)
         plugin.game.game_addr.fnFont_Render2DPrimitive = addresses[0].p();
     });
 
-    //"font3"附近使用了
-    batch_matcher.register_step("8B 54 24 08 53 56 8B 74 24 0C 80 3E 22", 1,
-                                [](const byte_pattern::result_type &addresses) {
-                                    plugin.game.game_addr.fnHash_HashStringFromSeediCase = addresses[0].p();
-                                });
+    //"font3"附近使用了（HashString 函数序言）
+    // 1.2.0.43 形如 mov edx,[esp+8];push ebx;push esi;mov esi,[esp+0xC];cmp byte[esi],0x22
+    // 1.2.0.59 寄存器分配变为 push ebx;push esi;mov esi,ecx;cmp byte[esi],0x22;sete bl
+    batch_matcher.register_step_candidates(
+        {"8B 54 24 08 53 56 8B 74 24 0C 80 3E 22", // 1.2.0.43
+         "53 56 8B F1 80 3E 22 0F 94"},            // 1.2.0.59（静态标定 0x86FDD0，唯一命中）
+        1,
+        [](const byte_pattern::result_type &addresses) {
+            plugin.game.game_addr.fnHash_HashStringFromSeediCase = addresses[0].p();
+        },
+        "fnHash_HashStringFromSeediCase");
 
-    //"font3"附近使用了
-    batch_matcher.register_step("53 55 56 57 8B F9 85 FF 74 3F", 1, [](const byte_pattern::result_type &addresses) {
-        plugin.game.game_addr.fnDictionary_GetElementByKey = addresses[0].p();
-    });
+    //"font3"附近使用了（grcTexturePC 字典 GetElementByKey 函数起点）
+    // 1.2.0.43：push ebx/ebp/esi/edi;mov edi,ecx;test edi,edi;je
+    // 1.2.0.59：mov eax,[全局];push ebx;push ebp;mov ebp,ecx;push esi;push edi;mov [ebp],0
+    batch_matcher.register_step_candidates(
+        {"53 55 56 57 8B F9 85 FF 74 3F",                                        // 1.2.0.43
+         "A1 ? ? ? ? 53 55 8B E9 56 57 C7 45 00 00 00 00 00"},                  // 1.2.0.59（0x86C570，唯一命中）
+        1,
+        [](const byte_pattern::result_type &addresses) {
+            plugin.game.game_addr.fnDictionary_GetElementByKey = addresses[0].p();
+        },
+        "fnDictionary_GetElementByKey");
 
     // GetStringWidth使用了
     batch_matcher.register_step("83 C7 02 53 57 E8", 1, [](const byte_pattern::result_type &addresses) {

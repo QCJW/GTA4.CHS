@@ -126,9 +126,15 @@ namespace gta_mail_reply
 
     void register_patches(batch_matching& batch_matcher)
     {
+        // 邮件模块整体归入 "mail" 分组：不同小版本（如 1.2.0.59）寄存器分配变化时，
+        // 只要组内有一个站点没命中，就整组不挂钩（邮件中文可能不完美），绝不拖垮其余汉化。
+        auto reg = [&](const char* p, std::size_t n, batch_matching::callback_type cb) {
+            batch_matcher.register_step(p, n, std::move(cb), true, "mail", true);
+        };
+
         //Native: ADD_FIRST_N_CHARACTERS_OF_STRING_TO_HTML_SCRIPT_OBJECT(75FC34EF)里面
         //邮件回复
-        batch_matcher.register_step("E8 ? ? ? ? 8D 44 24 08 50 56 E8", 1, [](const byte_pattern::result_type& addresses)
+        reg("E8 ? ? ? ? 8D 44 24 08 50 56 E8", 1, [](const byte_pattern::result_type& addresses)
             {
                 //要用的函数的地址
                 plugin.game.game_addr.fnMailAppendByteString = injector::GetBranchDestination(addresses[0].i()).get();
@@ -141,7 +147,7 @@ namespace gta_mail_reply
                 injector::MakeNOP(addresses[0].i(16), 11);
             });
 
-        batch_matcher.register_step("0F B6 1C 10 8D 42 01", 6, [](const byte_pattern::result_type& addresses)
+        reg("0F B6 1C 10 8D 42 01", 6, [](const byte_pattern::result_type& addresses)
             {
                 //读utf8序列
                 //用到"!--"的函数
@@ -154,56 +160,56 @@ namespace gta_mail_reply
 
         //CHtmlParser虚表第三个函数开头调用了MailGetStringChar
         //在MailGetStringChar里面
-        batch_matcher.register_step("0F B6 14 30 8D 46 01", 7, [](const byte_pattern::result_type& addresses)
+        reg("0F B6 14 30 8D 46 01", 7, [](const byte_pattern::result_type& addresses)
             {
                 //读utf8序列
                 injector::MakeInline<mr_read_eax_esi>(addresses[0].i(), addresses[0].i(7));
             });
 
         //在上述用到"!--"的函数里面
-        batch_matcher.register_step("FF 8F 48 04 00 00 8B 87 48 04 00 00 0F B6 5C 38 48", 1, [](const byte_pattern::result_type& addresses)
+        reg("FF 8F 48 04 00 00 8B 87 48 04 00 00 0F B6 5C 38 48", 1, [](const byte_pattern::result_type& addresses)
             {
                 //读上一个utf8序列
                 injector::MakeInline<mr_read_back_edi_eax>(addresses[0].i(), addresses[0].i(17));
             });
 
         //在上述用到"!--"的函数里面
-        batch_matcher.register_step("FF 8E 48 04 00 00 8B 8E 48 04 00 00 0F B6 5C 31 48", 1, [](const byte_pattern::result_type& addresses)
+        reg("FF 8E 48 04 00 00 8B 8E 48 04 00 00 0F B6 5C 31 48", 1, [](const byte_pattern::result_type& addresses)
             {
                 //读上一个utf8序列
                 injector::MakeInline<mr_read_back_esi_ecx>(addresses[0].i(), addresses[0].i(17));
             });
 
         //在上述CHtmlParser虚表第三个函数里面
-        batch_matcher.register_step("FF 89 48 04 00 00 8B 81 48 04 00 00 0F B6 44 08 48", 1, [](const byte_pattern::result_type& addresses)
+        reg("FF 89 48 04 00 00 8B 81 48 04 00 00 0F B6 44 08 48", 1, [](const byte_pattern::result_type& addresses)
             {
                 //读上一个utf8序列
                 injector::MakeInline<mr_read_back_ecx_eax>(addresses[0].i(), addresses[0].i(17));
             });
 
         //在上述用到"!--"的函数里面
-        batch_matcher.register_step("8D 14 39 41 89 8F 48 04 00 00 88 5A 48", 1, [](const byte_pattern::result_type& addresses)
+        reg("8D 14 39 41 89 8F 48 04 00 00 88 5A 48", 1, [](const byte_pattern::result_type& addresses)
             {
                 //写utf8序列
                 injector::MakeInline<mr_write_edi_ecx>(addresses[0].i(), addresses[0].i(13));
             });
 
         //在上述CHtmlParser虚表第三个函数里面
-        batch_matcher.register_step("8B 86 48 04 00 00 8D 0C 06 40 89 86 48 04 00 00 88 59 48", 1, [](const byte_pattern::result_type& addresses)
+        reg("8B 86 48 04 00 00 8D 0C 06 40 89 86 48 04 00 00 88 59 48", 1, [](const byte_pattern::result_type& addresses)
             {
                 //写utf8序列
                 injector::MakeInline<mr_write_esi_eax>(addresses[0].i(), addresses[0].i(19));
             });
 
         //在上述CHtmlParser虚表第三个函数调用的函数里面
-        batch_matcher.register_step("88 0C 2E 8B CF", 1, [](const byte_pattern::result_type& addresses)
+        reg("88 0C 2E 8B CF", 1, [](const byte_pattern::result_type& addresses)
             {
                 //写utf8序列
                 injector::MakeInline<mr_write_ebp_esi>(addresses[0].i(), addresses[0].i(6));
             });
 
         //Native: CONVERT_THEN_ADD_STRING_TO_HTML_SCRIPT_OBJECT(72EC0AA6)的转换过程里面
-        batch_matcher.register_step("C6 84 10 ? ? ? ? 3F", 1, [](const byte_pattern::result_type& addresses)
+        reg("C6 84 10 ? ? ? ? 3F", 1, [](const byte_pattern::result_type& addresses)
             {
                 plugin.game.game_addr.pDLCTruncateBuffer = *addresses[0].p<char*>(3);
 
@@ -212,7 +218,7 @@ namespace gta_mail_reply
             });
 
         //Native: GET_FIRST_N_CHARACTERS_OF_STRING(108B4A25)调用strncpy的地方
-        batch_matcher.register_step("56 50 68 ? ? ? ? E8", 1, [](const byte_pattern::result_type& addresses)
+        reg("56 50 68 ? ? ? ? E8", 1, [](const byte_pattern::result_type& addresses)
             {
                 injector::MakeCALL(addresses[0].i(7), gta_string::gtaUTF8strncpy);
                 injector::MakeNOP(addresses[0].i(24), 7);

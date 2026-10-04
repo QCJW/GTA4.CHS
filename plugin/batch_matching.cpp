@@ -1,14 +1,48 @@
 ﻿#include "batch_matching.h"
+#include <windows.h>
+#include <sstream>
+
+namespace
+{
+    void dbg_log(const std::string &msg)
+    {
+        ::OutputDebugStringA(("[GTA4.CHS] " + msg + "\r\n").c_str());
+    }
+}
 
 void batch_matching::register_step(const char *pattern, std::size_t expected_size, callback_type callback,
-                                   bool run_callback)
+                                   bool run_callback, const char *group, bool required)
 {
     match_step step;
     step.run_callback = run_callback;
+    step.required = required;
+    step.group = group ? group : "";
+    step.name = pattern;
+    step.patterns.emplace_back(pattern);
     step.expected_size = expected_size;
     step.callback = std::move(callback);
 
-    _steps.emplace(pattern, std::move(step));
+    _steps.emplace_back(std::move(step));
+}
+
+void batch_matching::register_step_candidates(std::initializer_list<const char *> patterns,
+                                              std::size_t expected_size, callback_type callback,
+                                              const char *name, bool run_callback,
+                                              const char *group, bool required)
+{
+    match_step step;
+    step.run_callback = run_callback;
+    step.required = required;
+    step.group = group ? group : "";
+    step.name = name ? name : (patterns.size() ? *patterns.begin() : "candidate");
+    for (auto p : patterns)
+    {
+        step.patterns.emplace_back(p);
+    }
+    step.expected_size = expected_size;
+    step.callback = std::move(callback);
+
+    _steps.emplace_back(std::move(step));
 }
 
 void batch_matching::clear()
@@ -22,11 +56,47 @@ bool batch_matching::perform_search()
 
     for (auto &step : _steps)
     {
-        // 写入缓存的数据，验证不成功时才进行搜索
-        pattern_obj.set_pattern(step.first.c_str());
+        // 多候选：按顺序取第一个命中数量恰好等于期望值的特征码
+        for (const auto &pat : step.patterns)
+        {
+            pattern_obj.set_pattern(pat.c_str());
+            pattern_obj.search();
+            step.result = pattern_obj.get();
 
-        pattern_obj.search();
-        step.second.result = pattern_obj.get();
+            if (step.result.size() == step.expected_size)
+            {
+                step.succeeded = true;
+                break;
+            }
+        }
+
+        if (!step.succeeded)
+        {
+            std::ostringstream os;
+            os << "特征码未命中: " << step.name << "，期望 " << step.expected_size
+               << " 处，实际 " << step.result.size() << " 处"
+               << (step.required ? (step.group.empty() ? "（必需）" : ("（分组 " + step.group + "）"))
+                                 : "（可选，跳过）");
+            dbg_log(os.str());
+        }
+    }
+
+    return true;
+}
+
+bool batch_matching::group_succeeded(const std::string &group) const
+{
+    if (group.empty())
+    {
+        return true;
+    }
+
+    for (const auto &step : _steps)
+    {
+        if (step.group == group && step.required && !step.succeeded)
+        {
+            return false;
+        }
     }
 
     return true;
@@ -34,18 +104,38 @@ bool batch_matching::perform_search()
 
 bool batch_matching::is_all_succeed() const
 {
-    return std::ranges::all_of(_steps, [](const std::pair<std::string, match_step> &step) {
-        return step.second.expected_size == step.second.result.size();
-    });
+    for (const auto &step : _steps)
+    {
+        if (!step.succeeded)
+        {
+            if (!step.required)
+            {
+                continue; // 可选步骤：跳过即可
+            }
+
+            if (!step.group.empty())
+            {
+                continue; // 分组步骤：整组降级，不拖垮其余汉化
+            }
+
+            return false; // 核心必需步骤失败：拒绝加载，避免写飞
+        }
+    }
+
+    return true;
 }
 
 void batch_matching::run_callbacks() const
 {
-    for (auto &step : _steps)
+    for (const auto &step : _steps)
     {
-        if (step.second.run_callback)
+        if (step.run_callback && step.succeeded && group_succeeded(step.group))
         {
-            step.second.callback(step.second.result);
+            step.callback(step.result);
+        }
+        else if (step.run_callback && !step.group.empty() && !group_succeeded(step.group))
+        {
+            dbg_log("分组 " + step.group + " 存在未命中步骤，跳过挂钩: " + step.name);
         }
     }
 }

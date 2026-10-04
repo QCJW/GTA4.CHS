@@ -34,6 +34,18 @@ add_library(plugin SHARED
     plugin.cpp
     string_table.cpp
     whm_table.cpp
+    # 1.0.7 / 1.0.8 legacy address-table path (universal build)
+    legacy/legacy_version.cpp
+    legacy/legacy_install.cpp
+    legacy/legacy_gta_benchmark.cpp
+    legacy/legacy_gta_font.cpp
+    legacy/legacy_gta_game.cpp
+    legacy/legacy_gta_html.cpp
+    legacy/legacy_gta_mail_reply.cpp
+    legacy/legacy_gta_menu.cpp
+    legacy/legacy_gta_phone.cpp
+    legacy/legacy_gta_save.cpp
+    legacy/legacy_gta_whm.cpp
 )
 
 target_compile_definitions(plugin PRIVATE NOMINMAX _CRT_SECURE_NO_WARNINGS)
@@ -42,6 +54,9 @@ target_precompile_headers(plugin PRIVATE "${CMAKE_SOURCE_DIR}/common/stdinc.h")
 
 target_link_libraries(plugin PRIVATE utf8::cpp utf8cpp::utf8cpp fmt::fmt-header-only)
 target_link_libraries(plugin PRIVATE nlohmann_json::nlohmann_json)
+
+# legacy version detection reads host EXE version resource
+target_link_libraries(plugin PRIVATE version)
 
 set_target_properties(plugin PROPERTIES OUTPUT_NAME "GTA4.CHS")
 set_target_properties(plugin PROPERTIES SUFFIX ".asi")

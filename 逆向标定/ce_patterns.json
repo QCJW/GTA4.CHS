@@ -1,0 +1,374 @@
+[
+ {
+  "file": "gta_benchmark.cpp",
+  "line": 10,
+  "pattern": "B8 68 2E 00 00 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 48,
+  "pattern": "81 EC 8C 0A 00 00",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 53,
+  "pattern": "F3 0F 10 44 24 18 8B C1 50",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 58,
+  "pattern": "89 AC 24 80 00 00 00 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 64,
+  "pattern": "0F B7 47 FC 83 EF 04",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 70,
+  "pattern": "88 4C 24 12 84 C9",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 77,
+  "pattern": "57 8B 7C 24 08 85 FF 75 04 33 C0 5F C3 56",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 84,
+  "pattern": "83 C0 E0 50 E8 ? ? ? ? D9 5C 24",
+  "expected": 2
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 90,
+  "pattern": "6A 01 57 E8 ? ? ? ? D9 5C 24 30",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 95,
+  "pattern": "EB 12 6A 01 57 E8 ? ? ? ? D9 5C 24 24",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 102,
+  "pattern": "F3 0F 11 0C 24 E8 ? ? ? ? 8B 35",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 107,
+  "pattern": "E8 ? ? ? ? 6A 01 57 E8 ? ? ? ? D9 5C 24 30",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 113,
+  "pattern": "8B CE 50 E8 ? ? ? ? 80 3D ? ? ? ? 6A",
+  "expected": 2
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 121,
+  "pattern": "B8 B4 10 00 00",
+  "expected": 1
+ },
+ {
+  "file": "gta_font.cpp",
+  "line": 127,
+  "pattern": "51 56 8B 74 24 0C 85 F6 75 05 D9 EE 5E 59 C3 66",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 11,
+  "pattern": "8B 3D ? ? ? ? 8B 68 04 8B 30",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 16,
+  "pattern": "C7 45 00 ? ? ? ? C7 45 44 00 00 00 00",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 24,
+  "pattern": "83 3D ? ? ? ? ? 8B 01 0F 44 C2 89 01 B0 01 C2 08 00",
+  "expected": 2
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 30,
+  "pattern": "A1 ? ? ? ? 80 7C 24 08 00",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 36,
+  "pattern": "0F B6 84 08 ? ? ? ? 66 0F 6E C0",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 42,
+  "pattern": "F3 0F 59 05 ? ? ? ? 88 4C 24 12",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 47,
+  "pattern": "8D AE ? ? ? ? 32 C0",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 52,
+  "pattern": "81 3D ? ? ? ? AD 7F 33 31",
+  "expected": 2
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 57,
+  "pattern": "F3 0F 11 05 ? ? ? ? 66 0F 6E 84 24 AC 00 00",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 63,
+  "pattern": "A1 ? ? ? ? 83 F8 FF 75 1E",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 68,
+  "pattern": "83 EC 30 83 3D ? ? ? ? FF",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 73,
+  "pattern": "51 55 56 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 78,
+  "pattern": "8A 0D ? ? ? ? 0F B6 D1",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 83,
+  "pattern": "83 EC 10 8B 44 24 14 F3 0F 7E 00",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 88,
+  "pattern": "8B 54 24 08 53 56 8B 74 24 0C 80 3E 22",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 94,
+  "pattern": "53 55 56 57 8B F9 85 FF 74 3F",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 99,
+  "pattern": "83 C7 02 53 57 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_game.cpp",
+  "line": 104,
+  "pattern": "83 EC 10 53 8B 5C 24 18 55 56",
+  "expected": 1
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 11,
+  "pattern": "8B F8 8D 44 24 08 50 57 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 17,
+  "pattern": "74 0A 50 55 E8",
+  "expected": 2
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 23,
+  "pattern": "7F 4B 56 52 8D 44 24 14 50 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 29,
+  "pattern": "03 C3 57 50 68 ? ? ? ? E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 36,
+  "pattern": "80 3D ? ? ? ? 6A F3 0F 10 05",
+  "expected": 1
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 42,
+  "pattern": "F3 0F 10 5A 24 72 5C",
+  "expected": 1
+ },
+ {
+  "file": "gta_html.cpp",
+  "line": 50,
+  "pattern": "F3 0F 5C 4B 04 0F 2E C1 9F F6 C4 44 7B 27",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 131,
+  "pattern": "E8 ? ? ? ? 8D 44 24 08 50 56 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 144,
+  "pattern": "0F B6 1C 10 8D 42 01",
+  "expected": 6
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 157,
+  "pattern": "0F B6 14 30 8D 46 01",
+  "expected": 7
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 164,
+  "pattern": "FF 8F 48 04 00 00 8B 87 48 04 00 00 0F B6 5C 38 48",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 171,
+  "pattern": "FF 8E 48 04 00 00 8B 8E 48 04 00 00 0F B6 5C 31 48",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 178,
+  "pattern": "FF 89 48 04 00 00 8B 81 48 04 00 00 0F B6 44 08 48",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 185,
+  "pattern": "8D 14 39 41 89 8F 48 04 00 00 88 5A 48",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 192,
+  "pattern": "8B 86 48 04 00 00 8D 0C 06 40 89 86 48 04 00 00 88 59 48",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 199,
+  "pattern": "88 0C 2E 8B CF",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 206,
+  "pattern": "C6 84 10 ? ? ? ? 3F",
+  "expected": 1
+ },
+ {
+  "file": "gta_mail_reply.cpp",
+  "line": 215,
+  "pattern": "56 50 68 ? ? ? ? E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_menu.cpp",
+  "line": 9,
+  "pattern": "D9 5C 24 4C F3 0F 10 44 24 4C F3 0F 58 44 24 2C",
+  "expected": 1
+ },
+ {
+  "file": "gta_menu.cpp",
+  "line": 23,
+  "pattern": "B9 ? ? ? ? F3 0F 11 44 24 54 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_menu.cpp",
+  "line": 36,
+  "pattern": "6A 00 68 ? ? ? ? F3 0F 58 44 24 20 F3 0F 11 44 24 4C",
+  "expected": 1
+ },
+ {
+  "file": "gta_menu.cpp",
+  "line": 46,
+  "pattern": "6A 00 68 ? ? ? ? B9 ? ? ? ? F3 0F 11 44 24 20",
+  "expected": 1
+ },
+ {
+  "file": "gta_phone.cpp",
+  "line": 10,
+  "pattern": "6A 64 53 57 E8",
+  "expected": 2
+ },
+ {
+  "file": "gta_phone.cpp",
+  "line": 16,
+  "pattern": "56 8D 44 24 10 53 50 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_save.cpp",
+  "line": 9,
+  "pattern": "8D 84 24 4C 01 00 00 50 8D 44 24 1C 50 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_save.cpp",
+  "line": 15,
+  "pattern": "68 80 00 00 00 8D 44 24 50 50 68 ? ? ? ? E8",
+  "expected": 2
+ },
+ {
+  "file": "gta_save.cpp",
+  "line": 26,
+  "pattern": "FF 35 ? ? ? ? E8 ? ? ? ? 83 C4 0C 50 E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_save.cpp",
+  "line": 32,
+  "pattern": "6A 3C 05 ? ? ? ? 50 68 ? ? ? ? E8",
+  "expected": 1
+ },
+ {
+  "file": "gta_whm.cpp",
+  "line": 21,
+  "pattern": "8B AB D8 00 00 00",
+  "expected": 1
+ }
+]
