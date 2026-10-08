@@ -4,30 +4,16 @@
 
 namespace gta4chs::legacy
 {
-void install_benchmark(game_version ver)
+void install_benchmark()
 {
-    (void)ver;
-    // 全都在使用"Benchmark%02d%02d%02d%02d%02d%02d.txt"的函数里 (1.0.8.0 基址 0x477D00)
     // Benchmark输出文字转码
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x46C).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x8D3).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x90F).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x94B).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x987).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x9C3).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x9FF).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0xA3B).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0xA77).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0xAB3).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x137F).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1483).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x19F3).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1A3A).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1A85).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1AC1).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1AFD).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1B39).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x1B6A).get(), gta_string::gtaTruncateString2);
-    injector::MakeCALL(injector::aslr_ptr(legacy::pick(0x407420, 0x477D00) + 0x207C).get(), gta_string::gtaTruncateString2);
+    const auto base = pick2(0x407420, 0x477D00);
+
+    for (const auto offset : {0x46Cu, 0x8D3u, 0x90Fu, 0x94Bu, 0x987u, 0x9C3u, 0x9FFu, 0xA3Bu, 0xA77u, 0xAB3u,
+                              0x137Fu, 0x1483u, 0x19F3u, 0x1A3Au, 0x1A85u, 0x1AC1u, 0x1AFDu, 0x1B39u, 0x1B6Au,
+                              0x207Cu})
+    {
+        injector::MakeCALL(injector::aslr_ptr(base + offset).get(), gta_string::gtaTruncateString2);
+    }
 }
 } // namespace gta_benchmark
