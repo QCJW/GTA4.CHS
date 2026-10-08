@@ -1,14 +1,5 @@
 ﻿#include "batch_matching.h"
 #include <windows.h>
-#include <sstream>
-
-namespace
-{
-    void dbg_log(const std::string &msg)
-    {
-        ::OutputDebugStringA(("[GTA4.CHS] " + msg + "\r\n").c_str());
-    }
-}
 
 void batch_matching::register_step(const char *pattern, std::size_t expected_size, callback_type callback,
                                    bool run_callback, const char *group, bool required)
@@ -69,16 +60,6 @@ bool batch_matching::perform_search()
                 break;
             }
         }
-
-        if (!step.succeeded)
-        {
-            std::ostringstream os;
-            os << "特征码未命中: " << step.name << "，期望 " << step.expected_size
-               << " 处，实际 " << step.result.size() << " 处"
-               << (step.required ? (step.group.empty() ? "（必需）" : ("（分组 " + step.group + "）"))
-                                 : "（可选，跳过）");
-            dbg_log(os.str());
-        }
     }
 
     return true;
@@ -132,10 +113,6 @@ void batch_matching::run_callbacks() const
         if (step.run_callback && step.succeeded && group_succeeded(step.group))
         {
             step.callback(step.result);
-        }
-        else if (step.run_callback && !step.group.empty() && !group_succeeded(step.group))
-        {
-            dbg_log("分组 " + step.group + " 存在未命中步骤，跳过挂钩: " + step.name);
         }
     }
 }

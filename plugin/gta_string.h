@@ -25,5 +25,6 @@ namespace gta_string
     uchar* gtaUTF8strncpy(uchar* dest, const uchar* source, unsigned size);
     void* gtaSpecialMemmove(uchar* dest, const uchar* source, unsigned size);
 
-    unsigned gtaUTF8Strlen(const uchar* str);
+    // 1.0.4 的窄串拷贝/截断与存档名还原在 legacy104/legacy104_string.h，高版本不加载。
+
 }
