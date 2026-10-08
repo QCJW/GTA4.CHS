@@ -1,6 +1,7 @@
 #include "gta_string.h"
 #include "plugin.h"
 #include "../common/fnv_hash.h"
+#include <cstring>
 #include <mutex>
 
 namespace gta_string
@@ -184,6 +185,8 @@ namespace gta_string
         return dest;
     }
 
+    // 1.0.4 的窄串拷贝/截断与存档名还原在 legacy104/legacy104_string.cpp，这里不再提供。
+
     void* gtaSpecialMemmove(uchar* dest, const uchar* source, unsigned size)
     {
         if (dest == nullptr || source == nullptr)
@@ -193,19 +196,4 @@ namespace gta_string
         return dest;
     }
 
-    unsigned gtaUTF8Strlen(const uchar* str)
-    {
-        if (str == nullptr)
-            return 0;
-
-        unsigned len = 0;
-
-        while (*str != 0)
-        {
-            utf8::unchecked::next(str);
-            ++len;
-        }
-
-        return len;
-    }
 }

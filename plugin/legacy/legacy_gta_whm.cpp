@@ -2,6 +2,7 @@
 #include "legacy.h"
 #include "../class_pointer.hpp"
 #include "../plugin.h"
+#include <intrin.h>
 
 namespace gta4chs::legacy
 {
@@ -15,12 +16,11 @@ struct html_data_node_replace_string
     }
 };
 
-void install_whm(game_version ver)
+void install_whm()
 {
-    (void)ver;
     // gta_html提到的用到CHtmlDataNode虚表的函数里
     // 替换whm自带文本
-    injector::MakeInline<html_data_node_replace_string>(injector::aslr_ptr(legacy::pick(0x43BECA, 0x4B41EA)).get(),
-                                                        injector::aslr_ptr(legacy::pick(0x43BECA, 0x4B41EA) + 6).get());
+    injector::MakeInline<html_data_node_replace_string>(injector::aslr_ptr(pick2(0x43BECA, 0x4B41EA)).get(),
+                                                        injector::aslr_ptr(pick2(0x43BECA, 0x4B41EA) + 6).get());
 }
 } // namespace gta_whm

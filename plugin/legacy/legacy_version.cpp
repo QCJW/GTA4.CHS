@@ -12,6 +12,11 @@ namespace gta4chs::legacy
     {
         detected classify(std::uint16_t major, std::uint16_t minor, std::uint16_t patch)
         {
+            if (major == 1 && minor == 0 && patch == 4)
+            {
+                return detected::v104;
+            }
+
             if (major == 1 && minor == 0 && patch == 7)
             {
                 return detected::v107;
@@ -31,7 +36,7 @@ namespace gta4chs::legacy
         }
 
         // 版本资源读不到时（个别重打包/加壳 EXE）的最后兜底：按文件大小分桶。
-        // 标定样本：1.0.7=15,505,792；1.0.8=15,718,808；1.2.0.59=17,425,752。
+        // 标定样本：1.0.4=13,822,600；1.0.7=15,505,792；1.0.8=15,718,808；1.2.0.59=17,425,752。
         detected classify_by_size()
         {
             wchar_t path[MAX_PATH]{};
@@ -53,31 +58,37 @@ namespace gta4chs::legacy
             size.HighPart = fad.nFileSizeHigh;
             const auto n = size.QuadPart;
 
-            const std::uint64_t k107 = 15505792ull;
-            const std::uint64_t k108 = 15718808ull;
-            const std::uint64_t kCE = 17425752ull;
-
-            auto near_of = [n](std::uint64_t ref) {
-                const std::uint64_t tol = ref / 50; // ±2%
-                return n > ref - tol && n < ref + tol;
+            static constexpr std::uint64_t kRefs[] = {
+                13822600ull, // 1.0.4
+                15505792ull, // 1.0.7
+                15718808ull, // 1.0.8
+                17425752ull, // 1.2.0.59
+            };
+            static constexpr detected kTags[] = {
+                detected::v104, detected::v107, detected::v108, detected::complete_edition,
             };
 
-            if (near_of(k107))
+            // 必须取最近的桶：两版 ±2% 窗口重叠 0.42M，真实 1.0.8 落在 1.0.7 窗口里，先命中先算会判错。
+            std::uint64_t best_delta = ~0ull;
+            int best_index = -1;
+
+            for (int i = 0; i < 4; ++i)
             {
-                return detected::v107;
+                const auto delta = (n > kRefs[i]) ? (n - kRefs[i]) : (kRefs[i] - n);
+
+                if (delta < best_delta)
+                {
+                    best_delta = delta;
+                    best_index = i;
+                }
             }
 
-            if (near_of(k108))
+            if (best_index < 0 || best_delta > kRefs[best_index] / 50) // 超出 ±2% 就不猜
             {
-                return detected::v108;
+                return detected::unknown;
             }
 
-            if (near_of(kCE))
-            {
-                return detected::complete_edition;
-            }
-
-            return detected::unknown;
+            return kTags[best_index];
         }
     }
 

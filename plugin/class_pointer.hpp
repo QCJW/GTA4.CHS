@@ -11,19 +11,4 @@ public:
         return reinterpret_cast<T*>(reinterpret_cast<std::intptr_t> (this) + offset);
     }
 
-    //TODO: call_member_function
-    template <typename Ret, typename ...Arg>
-    Ret call_member_function(std::uintptr_t func_addr, Arg ...args)
-    {
-        return reinterpret_cast<Ret(__thiscall*)(class_pointer*, Arg...)>(func_addr)(this, std::forward<Arg>(args)...);
-    }
-
-    //TODO: call_virtual_function
-    template <typename Ret, typename ...Arg>
-    Ret call_virtual_function(std::size_t index, Arg ...args)
-    {
-        auto func_addr = (*get_field<std::uintptr_t*>(0))[index];
-
-        return call_member_function(func_addr, std::forward<Arg>(args)...);
-    }
 };

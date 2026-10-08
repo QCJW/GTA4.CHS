@@ -14,10 +14,12 @@
 #include "gta_mail_reply.h"
 #include "gta_toupper.h"
 #include "legacy/legacy.h"
+#include "legacy104/legacy104.h"
 #include <windows.h>
 
 // legacy 模块定义在 gta4chs 命名空间下
 namespace legacy = gta4chs::legacy;
+namespace legacy104 = gta4chs::legacy104;
 
 CPlugin plugin;
 
@@ -59,18 +61,18 @@ bool CPlugin::Init(HMODULE module)
     game_module_path.SetModule(::GetModuleHandleW(nullptr));
     plugin_module_path.SetModule(module);
 
-    // 三合一：运行时按宿主 EXE 版本选择挂钩路径。
-    //   1.0.7.0 / 1.0.8.0：经验证的硬编码地址表（legacy）；
-    //   1.2.0.x（完整版/CE）：特征码批量扫描（batch_matching）；
-    //   识别不出来时默认走特征码路径——特征码失败会安全放弃加载，不会写飞。
     const auto detected = legacy::detect_host_version();
 
-    if (detected == legacy::detected::v107 || detected == legacy::detected::v108)
+    // 1.0.4 是窄字符（UTF-8）管线，整套地址表与钩子都不同构，走独立的 legacy104/。
+    if (detected == legacy::detected::v104)
     {
-        ::OutputDebugStringA(detected == legacy::detected::v107
-                                 ? "[GTA4.CHS] 识别为 1.0.7.0，走 legacy 地址表路径\r\n"
-                                 : "[GTA4.CHS] 识别为 1.0.8.0，走 legacy 地址表路径\r\n");
-
+        if (!legacy104::install_all())
+        {
+            return false;
+        }
+    }
+    else if (detected == legacy::detected::v107 || detected == legacy::detected::v108)
+    {
         if (!legacy::install_all(detected == legacy::detected::v107 ? legacy::game_version::v107
                                                                     : legacy::game_version::v108))
         {
@@ -79,8 +81,6 @@ bool CPlugin::Init(HMODULE module)
     }
     else
     {
-        ::OutputDebugStringA("[GTA4.CHS] 识别为 1.2.0.x（完整版/CE）或未知版本，走特征码路径\r\n");
-
         batch_matching batch_matcher;
 
         RegisterPatchSteps(batch_matcher);
@@ -89,7 +89,6 @@ bool CPlugin::Init(HMODULE module)
 
         if (!batch_matcher.is_all_succeed())
         {
-            ::OutputDebugStringA("[GTA4.CHS] 特征码未全部命中，放弃加载（请用 DebugView 查看未命中步骤）\r\n");
             return false;
         }
 

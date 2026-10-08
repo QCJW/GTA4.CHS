@@ -46,6 +46,19 @@ add_library(plugin SHARED
     legacy/legacy_gta_phone.cpp
     legacy/legacy_gta_save.cpp
     legacy/legacy_gta_whm.cpp
+    # 1.0.4 legacy address-table path (narrow / UTF-8 pipeline, fully self-contained)
+    legacy104/legacy104_install.cpp
+    legacy104/legacy104_narrow.cpp
+    legacy104/legacy104_bench.cpp
+    legacy104/legacy104_font.cpp
+    legacy104/legacy104_game.cpp
+    legacy104/legacy104_html.cpp
+    legacy104/legacy104_mail_reply.cpp
+    legacy104/legacy104_menu.cpp
+    legacy104/legacy104_phone.cpp
+    legacy104/legacy104_save.cpp
+    legacy104/legacy104_string.cpp
+    legacy104/legacy104_whm.cpp
 )
 
 target_compile_definitions(plugin PRIVATE NOMINMAX _CRT_SECURE_NO_WARNINGS)

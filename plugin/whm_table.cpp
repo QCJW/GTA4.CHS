@@ -29,12 +29,9 @@ const uchar* CWhmTable::GetTranslated(const uchar* src) const
 {
     auto it = m_offsets.find(fnv_hash::hash_string(src, false));
 
+    // 未命中就原样返回，调用方据此判断「没翻译」，一个指针都不动
     if (it == m_offsets.end())
-    {
         return src;
-    }
-    else
-    {
-        return &m_strings[it->second];
-    }
+
+    return &m_strings[it->second];
 }

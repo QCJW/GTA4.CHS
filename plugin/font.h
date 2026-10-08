@@ -117,6 +117,41 @@ struct TokenStruct
 };
 VALIDATE_SIZE(TokenStruct, 0x114);
 
+// —— 字体后端表 ——
+// 版本差异（步长 / token / 编码）全收进这张表，安装时登记一次；1.0.4 由 legacy104 登记，高版本用默认值。
+struct FontBackend
+{
+    // 步长与 CFontInfo::pTexture 偏移。1.0.4 的 CFontInfo 少两个 int → 0x250 / 0x44 / +0x238；
+    // 高版本 sizeof(CFontInfo) / 0x48 / +0x240。
+    std::size_t font_info_stride = sizeof(CFontInfo);
+    std::size_t font_details_stride = sizeof(CFontDetails);
+    std::size_t texture_offset = 0x240; // offsetof(CFontInfo, pTexture)
+
+    // token 解析与 token 串宽度。1.0.4 引擎侧是窄串，喂宽串会读到 '\0' 且字段偏移错位，需在边界转码。
+    int (*parse_token)(const GTAChar *str, GTAChar *token_string, TokenStruct *token_data) = nullptr;
+    void (*add_token_string_width)(const GTAChar *text, float *width, int render_index) = nullptr;
+
+    // 画一个汉字前的准备；返回值 = 是否绑了 CJK 图集（绑了就得在画完时还回去）。
+    // 1.0.4 还要排空引擎攒批的原生字形（否则逐帧闪）且所有槽位都绑；高版本只认 0/1/3。
+    bool (*prepare_cjk_draw)(int n_font) = nullptr;
+
+    // 画完一个汉字后的收尾（nullptr = 不收尾）。只有 1.0.4 需要：把纹理还给引擎，
+    // 否则紧随的 2D 立即图元会拿 CJK 图集采样（菜单闪）。
+    void (*finish_cjk_draw)(int n_font) = nullptr;
+
+    // 「单个 token」宽度分支的判定口径两版不同（反汇编确证）：
+    //   1.0.4 按钮表只认 [0x100,0x12B]（上界 299），且只有 [1,63] 才调 AddTokenStringWidth；
+    //   高版本沿用上游：不在按钮区间内一律按 token 串量宽，上界 300。不照抄则 `~s~` 会被多算一次 → 宽度偏大。
+    int button_token_max = 300;
+    bool restrict_token_string_width = false;
+};
+
+// 登记当前版本的字体后端。必须在任何字体钩子跑起来之前调用一次。
+void InstallFontBackend(const FontBackend& backend);
+
+// 取引擎第 index 个字体槽位的纹理；越界或读到的值不像堆指针时返回 nullptr。
+void* FontTextureAt(int index);
+
 class CFont
 {
 public:
@@ -130,6 +165,7 @@ public:
 
     static void PrintCharDispatch(float x, float y, GTAChar chr, bool buffered);
     static void PrintCHSChar(float x, float y, GTAChar chr);
+
 
     // 判断字符是否为不能放在行首的标点符号
     static bool IsSpecialPunctuationMark(GTAChar chr);
