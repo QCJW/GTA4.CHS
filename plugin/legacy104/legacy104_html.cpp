@@ -1,4 +1,5 @@
 ﻿#include "../gta_html.h"
+#include "../gta_html_link.h"
 #include "legacy104.h"
 #include "legacy104_string.h"
 #include "../gta_string.h"
@@ -45,7 +46,8 @@ void install_html()
     // GET_WEB_PAGE_LINK_AT_POSN 里跟 30.0 比较的判断
     injector::WriteMemory<uchar>(injector::aslr_ptr(0x4A63C7).get(), 0xEBu, true);
 
-    // CHtmlTextFormat vftable：超链接响应宽度计算
-    injector::WriteMemory<uchar>(injector::aslr_ptr(0x4A8F91).get(), 0xEBu, true);
+    // 超链接命中矩形收尾：原来无条件跳「同一行」分支，换行的链接宽度算成负数就点不到了
+    // 0x4A8F8A 起的 ucomiss/lahf/test ah,44h/jnp 共 9 字节换成跳板，0x4A8FE7 是两条分支的汇合点
+    gta_html_link::install_link_rect_fix(0x4A8F8A, 0x4A8FE7, 0x274);
 }
 }
