@@ -91,8 +91,9 @@ __declspec(naked) void html_link_rect_guard()
 void install_link_rect_fix(std::uintptr_t hook_va, std::uintptr_t done_va, std::uintptr_t origin_off)
 {
     g_origin_off = origin_off;
-    g_link_rect_done_va = reinterpret_cast<std::uintptr_t>(injector::aslr_ptr(done_va).get<unsigned char>());
-    injector::MakeCALL(injector::aslr_ptr(hook_va).get(), html_link_rect_guard);
-    injector::MakeNOP(injector::aslr_ptr(hook_va + 5).get(), 4);
+    // hook_va / done_va 来自 byte_pattern 扫描，已经是运行时绝对地址，不能再走 aslr_ptr
+    g_link_rect_done_va = done_va;
+    injector::MakeCALL(injector::raw_ptr(hook_va), html_link_rect_guard);
+    injector::MakeNOP(injector::raw_ptr(hook_va + 5), 4);
 }
 } // namespace gta_html_link
