@@ -1,5 +1,7 @@
 ﻿#include "gta_html.h"
+#include "gta_html_link.h"
 #include "gta_string.h"
+#include <cstdint>
 
 namespace gta_html
 {
@@ -40,17 +42,33 @@ void register_patches(batch_matching &batch_matcher)
 
     // Native: GET_WEB_PAGE_LINK_AT_POSN(C1C5B1B)的判断逻辑，跟30.0比较
     batch_matcher.register_step("F3 0F 10 5A 24 72 5C", 1, [](const byte_pattern::result_type &addresses) {
-        // 5D6CE0
+        // 5D6CF4
         injector::WriteMemory<uchar>(addresses[0].i(5), 0xEBu, true);
     });
 
     // IDA Names: const CHtmlTextFormat::`vftable'
     //其中一个使用此虚表的函数
     //计算超链接响应宽度的逻辑
+    // 1.2.0.x 也是同一个锚点失效缺陷，汉化后撞行尾的概率变高就显出来了
     batch_matcher.register_step("F3 0F 5C 4B 04 0F 2E C1 9F F6 C4 44 7B 27", 1,
                                 [](const byte_pattern::result_type &addresses) {
-                                    // 5D9B43
-                                    injector::WriteMemory<uchar>(addresses[0].i(12), 0xEBu, true);
+                                    // 5D9B51
+                                    const auto a = static_cast<std::uintptr_t>(addresses[0].i(0));
+                                    // 两条分支都以 jmp rel8 收尾，第一条的 jmp 在命中处 +0x33
+                                    const auto jmp_va = a + 0x33;
+
+                                    if (*reinterpret_cast<const uchar *>(jmp_va) == 0xEB)
+                                    {
+                                        const auto rel = static_cast<std::intptr_t>(
+                                            static_cast<std::int8_t>(*reinterpret_cast<const uchar *>(jmp_va + 1)));
+                                        // 栈帧是 0x268，页原点指针在 [esp+0x27C]
+                                        gta_html_link::install_link_rect_fix(
+                                            a + 5, static_cast<std::uintptr_t>(jmp_va + 2 + rel), 0x27C);
+                                    }
+                                    else
+                                    {
+                                        injector::WriteMemory<uchar>(addresses[0].i(12), 0xEBu, true);
+                                    }
                                 });
 }
 } // namespace gta_html

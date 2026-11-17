@@ -24,6 +24,7 @@ add_library(plugin SHARED
     gta_font.cpp
     gta_game.cpp
     gta_html.cpp
+    gta_html_link.cpp
     gta_mail_reply.cpp
     gta_menu.cpp
     gta_phone.cpp

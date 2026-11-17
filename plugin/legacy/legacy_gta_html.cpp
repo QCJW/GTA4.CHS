@@ -1,4 +1,5 @@
 ﻿#include "../gta_html.h"
+#include "../gta_html_link.h"
 #include "legacy.h"
 #include "../gta_string.h"
 #include "../plugin.h"
@@ -36,6 +37,12 @@ void install_html()
     // IDA Names: const CHtmlTextFormat::`vftable'
     // 其中一个使用此虚表的函数
     // 计算超链接响应宽度的逻辑
-    injector::WriteMemory<uchar>(injector::aslr_ptr(pick2(0x43F721, 0x4B7A31)).get(), 0xEBu, true);
+    // 原来无条件跳「同一行」分支，换行的链接宽度算成负数就点不到了；
+    // 挂跳板改锚点到当前行行首，汇合点是两条分支的 jmp 目标
+    // 静态 VA 先经 aslr_ptr 换成运行时地址：install_link_rect_fix 收运行时地址、内部不再换算。
+    gta_html_link::install_link_rect_fix(
+        reinterpret_cast<std::uintptr_t>(injector::aslr_ptr(pick2(0x43F71A, 0x4B7A2A)).get<unsigned char>()),
+        reinterpret_cast<std::uintptr_t>(injector::aslr_ptr(pick2(0x43F777, 0x4B7A87)).get<unsigned char>()),
+        0x274);
 }
-} // namespace gta_html
+} // namespace gta4chs::legacy
